@@ -1,0 +1,10 @@
+[dependencies]
+pyo3 = { version = "0.18", features = ["extension-module"] }
+ndarray = { version = "0.15.6" }
+allocation_o2 = { path = "../../../AllocationO2" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort" 

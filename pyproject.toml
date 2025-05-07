@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=42.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MLTT"
+version = "1.17.2"
+description = "Machine Learning Trading Toolkit"
+requires-python = ">=3.10"
+authors = [
+    {name = "Vlad Kochetov", email = "vladkoch@knu.ua"},
+]
+license = {text = "Custom"}
+keywords = [
+    "trading",
+    "portfolio-management",
+    "algorithmic-trading",
+    "risk-management",
+    "quantitative-analysis",
+    "machine-learning",
+    "trading-strategies",
+    "quantitative-finance",
+    "financial-modeling",
+    "financial-analysis",
+    "financial-engineering",
+    "quantitative-investing",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Financial and Insurance Industry"
+]
+dependencies = [
+    "numpy==2.0",
+    "binance-historical-data>=0.1.13",
+    "pyriemann>=0.6",
+    "torch>=2.5.1",
+    "tsfel>=0.1.9",
+    "polars[numpy,gpu,async,plot]>=1.2.1",
+    "ccxt>=4.4.36",
+    "hurst>=0.0.5",
+    "pydantic>=2.10.2",
+    "matplotlib>=3.8.0",
+    "allocation-o2==1.0.1",
+    "nautilus-trader[binance]==1.211.0",
+    "DeFiLlama>=2.3.0",
+    "catboost>=1.2.8"
+]
+
+[tool.setuptools]
+packages = {find = {exclude = ["research", "tests", "examples", "MLTT/tests"]}}
+zip-safe = false
