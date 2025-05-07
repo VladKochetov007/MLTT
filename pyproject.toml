@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MLTT"
-version = "1.17.2"
+version = "1.17.3"
 description = "Machine Learning Trading Toolkit"
 requires-python = ">=3.10"
 authors = [
@@ -41,8 +41,7 @@ dependencies = [
     "hurst>=0.0.5",
     "pydantic>=2.10.2",
     "matplotlib>=3.8.0",
-    "allocation-o2==1.0.1",
-    "nautilus-trader[binance]==1.211.0",
+    "allocation-o2>=1.0.2",
     "DeFiLlama>=2.3.0",
     "catboost>=1.2.8"
 ]
