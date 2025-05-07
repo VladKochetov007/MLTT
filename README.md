@@ -35,12 +35,12 @@ class CapitalAllocator(ABC):
     def predict(self, x: torch.Tensor) -> torch.Tensor:
         """
         Predict allocation weights based on input data.
-        
         Args:
-            - `x` (torch.Tensor): Tensor of data. shape: `(batch_size, >=min_observations, *n_information)` \
+            - `x` (torch.Tensor): Tensor of data. shape: `(>=min_observations, *n_information)` \
                 `n_information` is number of features. Usually `n_information` = `n_tradable`
         Returns:
-            torch.Tensor: Tensor of predicted weights. shape: `(batch_size, n_tradable)`. Sum of each abs(row) is 1
+            torch.Tensor: Tensor of predicted weights. shape: `(time_steps, n_tradable)` where time_steps matches input. 
+                Sum of each abs(row) is 1.
         """
         pass
 
