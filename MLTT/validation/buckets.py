@@ -78,7 +78,7 @@ class BucketWatcher:
         """
         if self.feature_indices is None or self.feature_names is None:
             raise ValueError("call make_buckets before backtest_buckets")
-        weights = weights[:, :-1]
+
         results = []
 
         for indices in self.feature_indices:
