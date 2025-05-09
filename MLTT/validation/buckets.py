@@ -3,7 +3,7 @@ Module for testing strategies on different buckets by some feature.
 For example top 10% volatility, bottom 10% volatility (price, vol of vol etc)
 """
 import torch
-from typing import Callable, List, Union, Tuple, Any
+from typing import Callable, List, Union, Tuple
 
 from MLTT.allocation.backtesting import backtest, BTResult
 
@@ -46,7 +46,7 @@ class BucketWatcher:
         self.feature_names = []
         for f in feature:
             for q in quantile:
-                # Применяем функцию признака вдоль столбцов (оси 0)
+                # Apply feature function along columns (axis 0)
                 feature_values = torch.stack([f(self.prices[:, i]) for i in range(self.prices.size(1))])
                 top_quantile = torch.quantile(feature_values, 1 - q)
                 bottom_quantile = torch.quantile(feature_values, q)
