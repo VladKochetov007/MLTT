@@ -3,7 +3,7 @@ Module for testing strategies on different buckets by some feature.
 For example top 10% volatility, bottom 10% volatility (price, vol of vol etc)
 """
 import torch
-from typing import Callable, List, Union, Tuple
+from typing import Callable
 
 from MLTT.allocation.backtesting import backtest, BTResult
 
@@ -13,17 +13,18 @@ class BucketWatcher:
     def __init__(self, prices: torch.Tensor):
         """
         Args:
-            - `prices` (torch.Tensor): 2-dimensional array of prices
+            - `prices` (torch.Tensor): 2-dimensional array of log-prices
         """
         self.prices = prices
         self.feature_indices = None
         self.feature_names = None
 
     def make_buckets(self,
-                     feature: Union[Callable, List[Callable]],
-                     quantile: Union[float, List[float]] = 0.1
-            ) -> Tuple[torch.Tensor, List[str]]:
-        """Separates prices into buckets according to some feature (top 10% and bottom 10%)
+                     feature: Callable | list[Callable],
+                     quantile: float | list[float] = 0.1
+            ) -> tuple[torch.Tensor, list[str]]:
+        """
+        Separates prices into buckets according to some feature (top 10% and bottom 10%)
 
         saves `feature_names`, `feature_indices` for further use
 
@@ -61,7 +62,7 @@ class BucketWatcher:
 
         return self.feature_indices, self.feature_names
 
-    def backtest_buckets(self, weights: torch.Tensor, **backtest_kwargs) -> List[BTResult]:
+    def backtest_buckets(self, weights: torch.Tensor, **backtest_kwargs) -> list[BTResult]:
         """firstly takes solid strategy prediction with all assets,
         After that uses computed weights on buckets.
 
@@ -82,7 +83,7 @@ class BucketWatcher:
 
         for indices in self.feature_indices:
             bt_result = backtest(
-                base_weights=weights[:, indices],
+                weights=weights[:, indices],
                 prices=self.prices[:, indices],
                 **backtest_kwargs
             )
