@@ -6,11 +6,6 @@ EPSILON = 1e-6
 CACHE_SIZE = 128
 
 
-def random_prices(shape: tuple[int, int]) -> torch.Tensor:
-    prices_matrix = torch.cumsum(torch.randn(*shape), dim=0)
-    prices_matrix += torch.randn(1, shape[1])
-    return prices_matrix
-
 @conditional_lru_cache(maxsize=CACHE_SIZE)
 def change(prices, lag: int = 1) -> torch.Tensor:
     """

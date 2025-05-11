@@ -1,14 +1,16 @@
-import numpy as np
 import torch
 from scipy.stats import ttest_1samp
 from dataclasses import dataclass
 
 from MLTT.allocation import CapitalAllocator
 from MLTT import backtest_model
-from MLTT.utils import random_prices
 from warnings import warn
 
 
+def _random_prices(shape: tuple[int, int]) -> torch.Tensor:
+    prices_matrix = torch.cumsum(torch.randn(*shape), dim=0)
+    prices_matrix += torch.randn(1, shape[1])
+    return prices_matrix
 
 class ConsistencyCheckResult:
     """Container for leak check results"""
@@ -199,7 +201,7 @@ class RandomLeakTester:
         """Generate random walk data if no external data provided"""
         if self.external_data is not None:
             return self.external_data
-        return random_prices(self.data_shape)
+        return _random_prices(self.data_shape)
 
     def _run_backtest(self, prices: torch.Tensor) -> torch.Tensor:
         """Execute backtest and return strategy returns"""

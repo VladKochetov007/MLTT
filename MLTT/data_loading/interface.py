@@ -144,7 +144,7 @@ def _convert_timestamp(ts: int | float) -> pd.Timestamp:
     except pd.errors.OutOfBoundsDatetime:
         return pd.to_datetime(ts, unit='ns')
 
-def _check_linearity(timestamps: np.ndarray, tolerance: float = 0.05) -> bool:
+def check_linearity(timestamps: np.ndarray, tolerance: float = 0.05) -> bool:
     """Check if timestamps have constant intervals within given tolerance."""
     if len(timestamps) < 2:
         return True
@@ -171,7 +171,7 @@ def check_klines_timeline(
 
         linear_passed = True
         if timeline_passed and linear:
-            linear_passed = _check_linearity(reference, tolerance)
+            linear_passed = check_linearity(reference, tolerance)
             passed = passed and linear_passed
     else:
         corrected_starts = klines[:, 0, 0]

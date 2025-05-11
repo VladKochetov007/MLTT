@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MLTT"
-version = "1.17.5"
+version = "1.18.0"
 description = "Machine Learning Trading Toolkit"
 requires-python = ">=3.10"
 authors = [
@@ -31,7 +31,7 @@ classifiers = [
     "Intended Audience :: Financial and Insurance Industry"
 ]
 dependencies = [
-    "numpy==2.0",
+    "numpy>=1.23.0",
     "binance-historical-data>=0.1.13",
     "pyriemann>=0.6",
     "torch>=2.5.1",

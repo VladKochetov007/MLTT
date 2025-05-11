@@ -273,3 +273,95 @@ Also available caching modes:
 - `DISABLED`
 
 Cache size can be changed in `MLTT.utils`
+
+### Validation with Buckets
+
+The `BucketWatcher` module allows you to test strategies on different subsets (buckets) of assets based on some feature or characteristic. This is useful for understanding how your strategy performs across different market segments, such as:
+
+- High vs. low volatility stocks
+- High vs. low trading volume assets
+- Different beta groups
+- Any custom characteristic you can calculate
+
+#### Creating and Testing Buckets
+
+```python
+from MLTT.validation import BucketWatcher
+import torch
+
+# Define your feature functions
+def volatility(x: torch.Tensor) -> torch.Tensor:
+    """Calculate volatility for each asset"""
+    return torch.std(x, dim=0)  # Returns tensor of shape (n_assets,)
+
+def average_volume(x: torch.Tensor) -> torch.Tensor:
+    """Calculate average volume for each asset"""
+    log_volumes = x[:, :, 4]  # Assuming OHLCV data
+    volumes = torch.exp(log_volumes)
+    return volumes.mean(dim=0)  # Returns tensor of shape (n_assets,)
+
+# Create BucketWatcher with price data and optional prediction info
+watcher = BucketWatcher(prices=log_prices, prediction_info=ohlcv_data)
+
+# Create buckets based on features
+# This will create 4 buckets: top 10% and bottom 10% for both features
+indices, names = watcher.make_buckets(
+    feature=[volatility, average_volume],
+    quantile=0.1
+)
+
+# Test your strategy on different buckets
+results = watcher.backtest_buckets(
+    model=my_strategy,
+    mode="FILTER_OUTPUT",  # or "SUBSET_INPUT"
+    commission=0.001
+)
+
+# Analyze results for each bucket
+for name, result in results.items():
+    print(f"Performance for {name}: {torch.exp(result.log_equity[-1]).item()}")
+```
+
+#### Testing Modes
+
+BucketWatcher supports two testing modes:
+
+1. **SUBSET_INPUT** - The model only receives data from the bucket subset
+   - Use this to see how your model performs when applied only on a specific subset of assets
+   - Tests both the model's ability to generate good signals AND how those signals perform on the subset
+
+2. **FILTER_OUTPUT** - The model receives all data but only the weights for the bucket assets are used
+   - Use this to see how your model's predictions for specific types of assets perform
+   - Tests how the model's signals perform on different asset types, but keeps the signal generation process the same
+
+#### Visualizing Bucket Performance
+
+```python
+import matplotlib.pyplot as plt
+
+# Plot performance of different buckets
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6))
+
+# Plot volatility buckets
+ax1.plot(results['top_0.1_volatility'].log_equity, label='High Volatility')
+ax1.plot(results['bottom_0.1_volatility'].log_equity, label='Low Volatility')
+ax1.set_title('Performance by Volatility')
+ax1.legend()
+
+# Plot volume buckets
+ax2.plot(results['top_0.1_average_volume'].log_equity, label='High Volume')
+ax2.plot(results['bottom_0.1_average_volume'].log_equity, label='Low Volume')
+ax2.set_title('Performance by Trading Volume')
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+![image](static/buckets.png)
+
+By analyzing performance across different asset buckets, you can:
+- Identify which market segments your strategy works best in
+- Discover potential weaknesses or biases in your model
+- Gain insights to refine your strategy for better performance
+- Create specialized strategies for specific market segments

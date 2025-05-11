@@ -1,8 +1,11 @@
 from torch import Tensor
 from MLTT.allocation import CapitalAllocator
+from MLTT.cache import conditional_lru_cache
+from MLTT.utils import CACHE_SIZE
 import copy
 
 
+@conditional_lru_cache(maxsize=CACHE_SIZE)
 def treshold_change(allocator: CapitalAllocator, threshold: float = 0.2, deepcopy: bool = True) -> CapitalAllocator:
     """
     Decorator for CapitalAllocator that prevents allocation changes unless they exceed a threshold.
