@@ -86,7 +86,6 @@ class BucketWatcher:
         Returns:
             BTResult: Backtest result for the bucket
         """
-        print(backtest_kwargs)
         bucket_prices = self.prices[:, indices]
         bucket_info = (
             self.prediction_info[:, indices] 
@@ -98,7 +97,6 @@ class BucketWatcher:
             if model is None:
                 raise ValueError("Model required for SUBSET_INPUT mode")
             
-            print(bucket_info.shape, bucket_prices.shape)
             return backtest_model(
                 model=model,
                 prices=bucket_prices,

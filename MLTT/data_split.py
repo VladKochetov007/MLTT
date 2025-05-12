@@ -1,7 +1,16 @@
 from sklearn.model_selection import train_test_split
+from typing import TypeVar
 
+T = TypeVar('T')
+V = TypeVar('V')
 
-def split_data[T, V](X: T, Y: V, train_size=0.5, val_size=0.25, test_size=0.25, random_state=None, shuffle=False) -> tuple[T, T, T, V, V, V]:
+def split_data(X: T, 
+               Y: V, 
+               train_size: float = 0.5, 
+               val_size: float = 0.25, 
+               test_size: float = 0.25, 
+               random_state: int | None = None, 
+               shuffle: bool = False) -> tuple[T, T, T, V, V, V]:
     """
     Splits X and Y dataframes into train, validation, and test sets.
 

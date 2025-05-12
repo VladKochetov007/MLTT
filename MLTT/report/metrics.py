@@ -78,7 +78,6 @@ class AnnualMean(Metric):
     def name(self) -> str:
         return f'Annual Mean (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         T = self.params.get('T', 1)
         return torch.mean(backtest_result.net_change) * T
@@ -92,7 +91,6 @@ class MonthlyMean(Metric):
     def name(self) -> str:
         return f'Monthly Mean (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         T = self.params.get('T', 1)
         return torch.mean(backtest_result.net_change) * T / 12
@@ -107,7 +105,6 @@ class AnnualStd(Metric):
     def name(self) -> str:
         return f'Annual Standard Deviation (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         T = self.params.get('T', 1)
         return torch.std(backtest_result.net_change) * sqrt(T)
@@ -122,7 +119,6 @@ class AnnualSharpe(Metric):
     def name(self) -> str:
         return f'Annual Sharpe Ratio (Annualization: {self.params.get("T", 1)}, Risk Free Rate: {self.params.get("risk_free_rate", 0) * 100}%)'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         T = self.params.get('T', 1)
         rf = self.params.get('risk_free_rate', 0)
@@ -140,7 +136,6 @@ class DownsideStd(Metric):
     def name(self) -> str:
         return 'Downside Standard Deviation'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         return torch.std(backtest_result.net_change[backtest_result.net_change < 0])   
     
@@ -154,7 +149,6 @@ class AnnualDownsideStd(Metric):
     def name(self) -> str:
         return f'Annual Downside Standard Deviation (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         T = self.params.get('T', 1)
         return DownsideStd().calculate(backtest_result) * sqrt(T)
@@ -169,7 +163,6 @@ class AnnualSortino(Metric):
     def name(self) -> str:
         return f'Annual Sortino Ratio (Annualization: {self.params.get("T", 1)}, Risk Free Rate: {self.params.get("risk_free_rate", 0) * 100}%)'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         rf = self.params.get('risk_free_rate', 0)
         mean_return = AnnualMean(**self.params).calculate(backtest_result)
@@ -186,7 +179,6 @@ class MaxDrawdown(Metric):
     def name(self) -> str:
         return 'Maximum Drawdown'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         # Use torch.cummax to get the cumulative maximum values
         running_max, _ = torch.cummax(backtest_result.log_equity, dim=0)
@@ -205,7 +197,6 @@ class AverageDrawdown(Metric):
     def name(self) -> str:
         return 'Average Drawdown'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         # Use torch.cummax to get the cumulative maximum values
         running_max, _ = torch.cummax(backtest_result.log_equity, dim=0)
@@ -224,7 +215,6 @@ class AnnualCalmar(Metric):
     def name(self) -> str:
         return f'Annual Calmar Ratio (Annualization: {self.params.get("T", 1)}, Risk Free Rate: {self.params.get("risk_free_rate", 0) * 100}%)'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         rf = self.params.get('risk_free_rate', 0)
         mean_return = AnnualMean(**self.params).calculate(backtest_result)
@@ -241,7 +231,6 @@ class ValueAtRisk(Metric):
     def name(self) -> str:
         return f'Value at Risk (confidence={self.params.get("var_confidence", 0.95) * 100}%)'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         confidence = self.params.get('var_confidence', 0.95)
         return torch.quantile(backtest_result.net_change, 1 - confidence)
@@ -256,7 +245,6 @@ class ConditionalValueAtRisk(Metric):
     def name(self) -> str:
         return f'Conditional Value at Risk (confidence={self.params.get("var_confidence", 0.95) * 100}%)'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         var = ValueAtRisk(**self.params).calculate(backtest_result)
         tail_losses = backtest_result.net_change[backtest_result.net_change <= var]
@@ -272,7 +260,6 @@ class MedianDrawdown(Metric):
     def name(self) -> str:
         return 'Median Drawdown'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         return torch.median(torch.cummax(backtest_result.log_equity, dim=0)[0] - backtest_result.log_equity)
 
@@ -290,7 +277,6 @@ class AnnualAlpha(Metric):
     def name(self) -> str:
         return f'Annual Alpha (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         T = self.params.get('T', 1)
         
@@ -317,7 +303,6 @@ class AnnualBeta(Metric):
     def name(self) -> str:
         return f'Annual Beta (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         if len(backtest_result.net_change) != len(self.benchmark):
             warn("Strategy data and benchmark must have the same length")
@@ -336,7 +321,6 @@ class UlcerIndex(Metric):
     def name(self) -> str:
         return 'Ulcer Index'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         drawdowns = torch.cummax(backtest_result.log_equity, dim=0)[0] - backtest_result.log_equity
         return torch.sqrt(torch.mean(drawdowns**2))
@@ -351,7 +335,6 @@ class Skewness(Metric):
     def name(self) -> str:
         return 'Skewness'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         return skew(backtest_result.net_change.cpu())
 
@@ -365,7 +348,6 @@ class Kurtosis(Metric):
     def name(self) -> str:
         return 'Excess Kurtosis'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         return kurtosis(backtest_result.net_change.cpu())
 
@@ -399,7 +381,6 @@ def years_to_seconds(years: float) -> float:
     return years * 365 * 24 * 60 * 60
 
 
-@conditional_lru_cache(maxsize=CACHE_SIZE)
 def calculate_drawdown_durations(log_equity: torch.Tensor) -> torch.Tensor:
     cum_max = torch.cummax(log_equity, dim=0)[0]
     drawdowns = cum_max - log_equity
@@ -451,7 +432,6 @@ class AveragePositionDuration(Metric):
     def name(self) -> str:
         return 'Average Position Duration'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         """
         Calculate the average duration of positions.
@@ -507,7 +487,6 @@ class DailyTurnover(Metric):
     def name(self) -> str:
         return f'Daily Turnover (Annualization: {self.params.get("T", 1)})'
 
-    @conditional_lru_cache(maxsize=CACHE_SIZE)
     def calculate(self, backtest_result: BTResult) -> float:
         weights = backtest_result.weights  # Shape (n_observations, n_assets)
         if weights is None:
