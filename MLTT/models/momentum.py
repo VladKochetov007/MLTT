@@ -381,12 +381,13 @@ class VolatilityTargetingWrapper(BaseAllocator):
     
     Source: https://www.algos.org/p/breaking-down-momentum-strategies
     
-    Parameters:
-        base_model: The underlying allocation model to wrap
-        volatility_period: Lookback period for volatility calculation
-        target_volatility: Annual volatility target (e.g., 0.15 for 15%)
-        max_leverage: Maximum allowed leverage
-        penalize_high_vol: Whether to additionally penalize high volatility assets
+    Args:
+        - `base_model` (BaseAllocator): The underlying allocation model to wrap
+        - `volatility_period` (int): Lookback period for volatility calculation
+        - `target_volatility` (float): Annual volatility target (e.g., 0.15 for 15%)
+        - `max_leverage` (float): Maximum allowed leverage
+        - `penalize_high_vol` (bool): Whether to additionally penalize high volatility assets
+        - `T` (int): Number of days in a year (default: 365)
     """
     
     def __init__(
@@ -395,12 +396,13 @@ class VolatilityTargetingWrapper(BaseAllocator):
         volatility_period: int = 63,  # ~3 months of trading days
         target_volatility: float = 0.15,  # 15% annual volatility target
         max_leverage: float = 2.0,
-        penalize_high_vol: bool = True
+        penalize_high_vol: bool = True,
+        T: int = 365
     ):
         self.base_model = base_model
         self.volatility_period = volatility_period
-        # Convert annual target to daily
-        self.target_volatility = target_volatility / (252 ** 0.5)  
+        # Convert annual target to daily using specified T
+        self.target_volatility = target_volatility / (T ** 0.5)  
         self.max_leverage = max_leverage
         self.penalize_high_vol = penalize_high_vol
         
@@ -416,7 +418,7 @@ class VolatilityTargetingWrapper(BaseAllocator):
         Apply volatility targeting to the base model's weights
         
         Args:
-            x: Input tensor (can be prices or other data)
+            - `x` (torch.Tensor): Input tensor (can be prices or other data)
             
         Returns:
             Volatility-targeted weights

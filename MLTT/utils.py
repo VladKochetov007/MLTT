@@ -5,7 +5,6 @@ from MLTT.cache import conditional_lru_cache
 EPSILON = 1e-6
 CACHE_SIZE = 128
 
-
 @conditional_lru_cache(maxsize=CACHE_SIZE)
 def change(prices, lag: int = 1) -> torch.Tensor:
     """
@@ -19,7 +18,8 @@ def change(prices, lag: int = 1) -> torch.Tensor:
     """
     prices = torch.as_tensor(prices)
 
-    shifted_prices = torch.cat((prices[0].repeat(lag, 1), prices))
+    pad = prices[0].detach().repeat(lag, 1)
+    shifted_prices = torch.cat((pad, prices), dim=0)
 
     return shifted_prices[lag:] - shifted_prices[:-lag]
 
