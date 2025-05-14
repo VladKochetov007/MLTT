@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from MLTT.allocation import BaseAllocator
 from MLTT.allocation.allocators import PriceAwareAllocator
 from MLTT.technical.non_trivial import price_channel
-from MLTT.utils import multivariate_barrier, to_weights_matrix, change, EPSILON, calculate_betas
+from MLTT.utils import multivariate_barrier, to_weights_matrix, change, EPSILON
 
 
 def get_price_data(model: BaseAllocator, x: torch.Tensor) -> torch.Tensor:
