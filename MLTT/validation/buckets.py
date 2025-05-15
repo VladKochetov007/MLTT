@@ -105,7 +105,11 @@ class BucketWatcher:
             )
         else:  # FILTER_OUTPUT mode
             # Get weights using full data
-            raw_weights = model(self.prediction_info)
+            input_data = self.prediction_info
+            if input_data is None:
+                input_data = self.prices
+
+            raw_weights = model(input_data)
             raw_weights = torch.roll(raw_weights, 1, dims=0)
             
             # Filter weights by bucket indices
