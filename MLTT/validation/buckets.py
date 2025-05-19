@@ -73,6 +73,7 @@ class BucketWatcher:
         indices: torch.Tensor,
         model: CapitalAllocator | None,
         mode: BucketMode,
+        precalculated_weights: torch.Tensor | None = None,
         **backtest_kwargs
     ) -> BTResult:
         """Run backtest for a single bucket
@@ -81,6 +82,7 @@ class BucketWatcher:
             - `indices` (torch.Tensor): Boolean tensor indicating which assets belong to the bucket
             - `model` (CapitalAllocator | None): Model to use for predictions
             - `mode` (BucketMode): Testing mode
+            - `precalculated_weights` (torch.Tensor | None): Pre-calculated weights for FILTER_OUTPUT mode
             - `**backtest_kwargs`: Additional arguments for backtest function
             
         Returns:
@@ -104,16 +106,11 @@ class BucketWatcher:
                 **backtest_kwargs
             )
         else:  # FILTER_OUTPUT mode
-            # Get weights using full data
-            input_data = self.prediction_info
-            if input_data is None:
-                input_data = self.prices
-
-            raw_weights = model(input_data)
-            raw_weights = torch.roll(raw_weights, 1, dims=0)
-            
+            if precalculated_weights is None:
+                raise ValueError("Pre-calculated weights required for FILTER_OUTPUT mode")
+                
             # Filter weights by bucket indices
-            bucket_weights = raw_weights[:, indices]
+            bucket_weights = precalculated_weights[:, indices]
             
             # Backtest filtered weights
             return backtest(
@@ -175,7 +172,7 @@ class BucketWatcher:
         model: CapitalAllocator | None = None,
         mode: BucketMode = BucketMode.SUBSET_INPUT,
         **backtest_kwargs
-    ) -> list[BTResult]:
+    ) -> dict[str, BTResult]:
         """Test strategy on different buckets using specified mode.
         
         Args:
@@ -185,7 +182,7 @@ class BucketWatcher:
             - `**backtest_kwargs`: Additional arguments for backtest function
                 
         Returns:
-            list[BTResult]: backtest results for each bucket
+            dict[str, BTResult]: backtest results for each bucket
             
         Note:
             In FILTER_OUTPUT mode, the function will first run model with full data
@@ -196,7 +193,20 @@ class BucketWatcher:
         if model is None:
             raise ValueError("Model is required for both modes")
             
+        # Pre-calculate weights for FILTER_OUTPUT mode
+        precalculated_weights = None
+        if mode == BucketMode.FILTER_OUTPUT:
+            input_data = self.prediction_info if self.prediction_info is not None else self.prices
+            raw_weights = model(input_data)
+            precalculated_weights = torch.roll(raw_weights, 1, dims=0)
+            
         return {
-            name: self._backtest_bucket(indices, model, mode, **backtest_kwargs)
+            name: self._backtest_bucket(
+                indices, 
+                model, 
+                mode, 
+                precalculated_weights=precalculated_weights,
+                **backtest_kwargs
+            )
             for name, indices in zip(self.feature_names, self.feature_indices)
         }
