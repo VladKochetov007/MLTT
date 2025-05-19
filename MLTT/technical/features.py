@@ -2,9 +2,12 @@ import torch
 
 from datetime import datetime
 import numpy as np
-from MLTT.utils import apply_columnwise
+
+from MLTT.utils import apply_columnwise, CACHE_SIZE
+from MLTT.cache import conditional_lru_cache
 
 
+@conditional_lru_cache(CACHE_SIZE)
 def sma(close_log: torch.Tensor, period: int) -> torch.Tensor:
     """
     Computes Simple Moving Average using cumulative sum approach.
@@ -44,6 +47,7 @@ def sma(close_log: torch.Tensor, period: int) -> torch.Tensor:
     return (moving_sum / window).to(close_log.dtype)
 
 
+@conditional_lru_cache(CACHE_SIZE)
 def ema(close_log: torch.Tensor, period: int) -> torch.Tensor:
     """
     Computes Exponential Moving Average (EMA) of a time series using vectorized PyTorch ops.
@@ -66,6 +70,7 @@ def ema(close_log: torch.Tensor, period: int) -> torch.Tensor:
     
     return ema
 
+@conditional_lru_cache(CACHE_SIZE)
 def stdev(series: torch.Tensor, period: int) -> torch.Tensor:
     """
     Calculates rolling standard deviation of a time series.
@@ -94,6 +99,7 @@ def stdev(series: torch.Tensor, period: int) -> torch.Tensor:
     return std.squeeze(1).T  # -> (T, N)
 
 
+@conditional_lru_cache(CACHE_SIZE)
 def _kalman_muth_ewma_volatility(returns, 
                                 mu: float = 0.0, 
                                 lambda_: float = 0.05,
@@ -160,6 +166,7 @@ def _kalman_muth_ewma_volatility(returns,
 
     return sigma_est, x_filt
 
+@conditional_lru_cache(CACHE_SIZE)
 def kalman_muth_volatility(
         returns, 
         mu: float = 0.0, 
@@ -173,6 +180,7 @@ def kalman_muth_volatility(
     return apply_columnwise(returns, lambda x: _kalman_muth_ewma_volatility(x, mu, lambda_, tau_psi, tau_eta, init_state_variance)[0])
 
 
+@conditional_lru_cache(CACHE_SIZE)
 def z_score(series: torch.Tensor, period: int, mean: float | None = None) -> torch.Tensor:
     if mean is None:
         return (series - sma(series, period)) / stdev(series, period)
@@ -180,6 +188,7 @@ def z_score(series: torch.Tensor, period: int, mean: float | None = None) -> tor
         return (series - mean) / stdev(series, period)
 
 
+@conditional_lru_cache(CACHE_SIZE)
 def vwap(prices: torch.Tensor, volumes: torch.Tensor, period: int) -> torch.Tensor:
     """
     Computes Volume-Weighted Average Price with dynamic window handling.
@@ -226,6 +235,7 @@ def vwap(prices: torch.Tensor, volumes: torch.Tensor, period: int) -> torch.Tens
     return vwap_values.to(prices.dtype)
 
 
+@conditional_lru_cache(CACHE_SIZE)
 def rsi(close_log: torch.Tensor, period: int) -> torch.Tensor:
     """
     Calculates the Relative Strength Index (RSI) of a time series.
