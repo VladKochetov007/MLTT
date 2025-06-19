@@ -47,5 +47,5 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = {find = {exclude = ["research", "tests", "examples", "MLTT/tests"]}}
+packages = {find = {exclude = ["research", "tests", "examples", "MLTT/tests", "private"]}}
 zip-safe = false
