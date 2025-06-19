@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MLTT"
-version = "1.19.5"
+version = "1.19.7"
 description = "Machine Learning Trading Toolkit"
+readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     {name = "Vlad Kochetov", email = "vladkoch@knu.ua"},

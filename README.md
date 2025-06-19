@@ -1,4 +1,5 @@
 # MLTT
+[![PyPI Downloads](https://static.pepy.tech/badge/MLTT)](https://pepy.tech/projects/MLTT)
 
 Machine Learning Trading Toolkit. Library for portfolio rebalancing strategy research and development.
 
@@ -144,7 +145,7 @@ print(f"Total expenses: {result.expenses_log.sum().item()}")
 ```
 
 Vizualization of `result.log_equity` and `result.gross_equity`
-![image](static/bt.png)
+![image](https://raw.githubusercontent.com/VladKochetov007/MLTT/main/static/bt.png)
 
 #### Custom Input Data
 You're not limited to using just price data for your strategies. The `backtest_model` function accepts a `prediction_info` parameter that allows you to provide custom data to your model:
@@ -358,7 +359,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-![image](static/buckets.png)
+![image](https://raw.githubusercontent.com/VladKochetov007/MLTT/main/static/buckets.png)
 
 By analyzing performance across different asset buckets, you can:
 - Identify which market segments your strategy works best in
