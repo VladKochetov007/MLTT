@@ -1,7 +1,7 @@
 [dependencies]
 pyo3 = { version = "0.18", features = ["extension-module"] }
 ndarray = { version = "0.15.6" }
-allocation_o2 = { path = "../../../AllocationO2" }
+allocation_o2 = { path = "../../../AllocationO2" } # TODO: make working publically
 
 [profile.release]
 opt-level = 3
