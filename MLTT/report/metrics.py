@@ -391,7 +391,11 @@ def calculate_drawdown_durations(log_equity: torch.Tensor) -> torch.Tensor:
     starts = torch.where(diff == 1)[0] + 1
     ends = torch.where(diff == -1)[0] + 1
 
-    # Обрабатываем незавершенную просадку в конце
+    # Handle drawdown at the beginning of the data
+    if is_drawdown[0]:
+        starts = torch.cat([torch.tensor([0], device=starts.device), starts])
+
+    # Handle unfinished drawdown at the end
     if is_drawdown[-1]:
         ends = torch.cat([ends, torch.tensor([len(is_drawdown)], device=ends.device)])
 
@@ -451,6 +455,10 @@ class AveragePositionDuration(Metric):
         long_starts = torch.where(torch.diff(is_long_position.int()) == 1)[0] + 1
         long_ends = torch.where(torch.diff(is_long_position.int()) == -1)[0] + 1
 
+        # If the first period is a long position, add the start index
+        if is_long_position[0]:
+            long_starts = torch.cat([torch.tensor([0], device=long_starts.device), long_starts])
+
         # If the last period is a long position, add the end index
         if is_long_position[-1]:
             long_ends = torch.cat([long_ends, torch.tensor([len(is_long_position)], device=long_ends.device)])
@@ -458,6 +466,10 @@ class AveragePositionDuration(Metric):
         # Find the indices where short positions start and end
         short_starts = torch.where(torch.diff(is_short_position.int()) == 1)[0] + 1
         short_ends = torch.where(torch.diff(is_short_position.int()) == -1)[0] + 1
+
+        # If the first period is a short position, add the start index
+        if is_short_position[0]:
+            short_starts = torch.cat([torch.tensor([0], device=short_starts.device), short_starts])
 
         # If the last period is a short position, add the end index
         if is_short_position[-1]:
